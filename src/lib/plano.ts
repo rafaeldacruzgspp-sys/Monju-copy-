@@ -36,6 +36,7 @@ const MOLDES: Record<TipoRefeicao, Vaga[]> = {
     { tipo: 'proteina', papeis: ['proteinaCafe', 'laticinio'], rotulo: 'proteína' },
     { tipo: 'carbo', papeis: ['carboCafe'], rotulo: 'carboidrato' },
     { tipo: 'fixo', papeis: ['fruta'], rotulo: 'fruta' },
+    { tipo: 'fixo', papeis: ['bebida'], rotulo: 'bebida' },
   ],
   almoco: [
     { tipo: 'proteina', papeis: ['proteina'], rotulo: 'proteína' },
@@ -56,6 +57,20 @@ const MOLDES: Record<TipoRefeicao, Vaga[]> = {
   ],
   ceia: [{ tipo: 'proteina', papeis: ['laticinio'], rotulo: 'laticínio' }],
 };
+
+/** Docinho do dia: porção fixa, compensada no restante do dia. */
+const VAGA_DOCE: Vaga = { tipo: 'fixo', papeis: ['doce'], rotulo: 'docinho' };
+
+/** O docinho vai no lanche da tarde; sem lanche, vira sobremesa do almoço. */
+function indiceDoce(slots: Slot[]): number {
+  const lanche = slots.findIndex((x) => x.nome === 'Lanche da tarde');
+  return lanche >= 0 ? lanche : slots.findIndex((x) => x.tipo === 'almoco');
+}
+
+function vagasDoSlot(slots: Slot[], si: number): Vaga[] {
+  const base = MOLDES[slots[si].tipo];
+  return si === indiceDoce(slots) ? [...base, VAGA_DOCE] : base;
+}
 
 interface Slot {
   tipo: TipoRefeicao;
@@ -85,6 +100,9 @@ export const DISTRIBUICAO: Record<3 | 4 | 5 | 6, Slot[]> = {
     s('ceia', 'Ceia', '21:30', 10),
   ],
 };
+
+/** Versão do gerador. 2 = bebida no café + docinho do dia. */
+export const VERSAO_GERADOR = 2;
 
 /** Peso de sorteio de um favorito em relação a um alimento comum. */
 export const PESO_FAVORITO = 6;
@@ -141,6 +159,7 @@ export function arredondarPorcao(a: Alimento, gramas: number): number {
 
 function montarRefeicao(
   slot: Slot,
+  vagas: Vaga[],
   alvo: { kcal: number; proteina: number },
   escolhas: Map<Vaga, Alimento | undefined>,
 ): RefeicaoPlano {
@@ -151,12 +170,11 @@ function montarRefeicao(
   let kcal = 0;
   let prot = 0;
 
-  const vagas = MOLDES[slot.tipo];
   // 1) itens de porção fixa e salada
   for (const v of vagas) {
     const a = escolhas.get(v);
     if (!a) {
-      faltando.push(v.rotulo);
+      if (v !== VAGA_DOCE) faltando.push(v.rotulo); // sem docinho é escolha, não falta
       continue;
     }
     if (v.tipo === 'fixo' || v.tipo === 'salada') {
@@ -265,7 +283,8 @@ export function gerarSemana(metas: MetasPlano, pref: Preferencias, semente: numb
     const hoje = new Set<string>(); // evita o mesmo alimento duas vezes no mesmo dia
     const refeicoes = slots.map((slot, si) => {
       const escolhas = new Map<Vaga, Alimento | undefined>();
-      MOLDES[slot.tipo].forEach((v, vi) => {
+      const vagas = vagasDoSlot(slots, si);
+      vagas.forEach((v, vi) => {
         const chave = `${si}:${vi}`;
         const evitar = [...hoje, ...(ontem.has(chave) ? [ontem.get(chave)!] : [])];
         const a = sortear(candidatos(v.papeis, pref), pref, rnd, evitar);
@@ -273,7 +292,7 @@ export function gerarSemana(metas: MetasPlano, pref: Preferencias, semente: numb
         escolhas.set(v, a);
         if (a) ontem.set(chave, a.id);
       });
-      return montarRefeicao(slot, metas, escolhas);
+      return montarRefeicao(slot, vagas, metas, escolhas);
     });
     dias.push(equilibrarDia({ refeicoes }, metas));
   }
@@ -289,9 +308,10 @@ export function trocarItem(
   pref: Preferencias,
   semente: number,
 ): DiaPlano {
-  const slot = DISTRIBUICAO[pref.refeicoesPorDia][indiceRefeicao];
+  const slots = DISTRIBUICAO[pref.refeicoesPorDia];
+  const slot = slots[indiceRefeicao];
   const ref = dia.refeicoes[indiceRefeicao];
-  const vagas = MOLDES[slot.tipo];
+  const vagas = vagasDoSlot(slots, indiceRefeicao);
   // Associa cada vaga do molde ao item atual pelo tipo (os itens seguem a ordem do molde).
   const escolhas = new Map<Vaga, Alimento | undefined>();
   const restantes = [...ref.itens];
@@ -313,7 +333,7 @@ export function trocarItem(
     if (novo) escolhas.set(vagaTrocada, novo);
   }
   const refeicoes = [...dia.refeicoes];
-  refeicoes[indiceRefeicao] = montarRefeicao(slot, metas, escolhas);
+  refeicoes[indiceRefeicao] = montarRefeicao(slot, vagas, metas, escolhas);
   return equilibrarDia({ refeicoes }, metas);
 }
 

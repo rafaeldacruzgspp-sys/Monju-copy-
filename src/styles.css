@@ -853,3 +853,100 @@ textarea.entrada {
   padding: 12px;
   font-size: 16px;
 }
+
+.gerando {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: color-mix(in srgb, var(--fundo) 80%, transparent);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: grid;
+  place-items: center;
+  padding: 20px;
+}
+
+.gerando-caixa {
+  width: 100%;
+  max-width: 420px;
+  background: var(--superficie);
+  border: 1px solid var(--borda);
+  border-radius: 28px;
+  box-shadow: 0 20px 60px rgb(0 0 0 / 0.18);
+  padding: 26px 22px;
+  text-align: center;
+}
+
+.gerando-caixa h2 {
+  margin: 8px 0 4px;
+  font-size: 22px;
+  letter-spacing: -0.01em;
+}
+
+.gerando-caixa p {
+  margin: 0 0 14px;
+}
+
+.gerando-icone {
+  font-size: 44px;
+}
+
+.gerando-pct {
+  font-size: 44px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--verde-forte);
+  letter-spacing: -0.03em;
+}
+
+.gerando-barra {
+  height: 14px;
+  margin: 8px 0 18px;
+}
+
+.gerando-etapas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+}
+
+.gerando-etapas li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gerando-marca {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--borda);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.gerando-marca.ok {
+  background: var(--verde);
+  border-color: var(--verde);
+  color: var(--texto-no-verde);
+}
+
+.gerando-marca.agora {
+  border-color: var(--verde);
+  border-top-color: transparent;
+  animation: girar 0.8s linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}

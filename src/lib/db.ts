@@ -54,6 +54,8 @@ export interface PlanoSemana {
   comprados: string[];
   /** Preferências usadas na geração (para avisar quando mudarem). */
   preferencias?: string;
+  /** Versão do gerador que criou o plano (ausente = 1). */
+  versao?: number;
 }
 
 export interface RegistroDiario {
