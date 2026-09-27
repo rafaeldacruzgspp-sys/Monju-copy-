@@ -1,5 +1,7 @@
 import { motion } from 'motion/react';
 import { useState } from 'react';
+import { ResumoAgua } from '../components/Agua';
+import { BarrasCalorias, FormComida, totaisDiario } from '../components/Comida';
 import { FormAplicacao, FormPeso } from '../components/Formularios';
 import { BarraProgresso, Botao, Card, Icone, NumeroAnimado, SeloImc } from '../components/ui';
 import {
@@ -15,12 +17,26 @@ import {
   somarDias,
 } from '../lib/calculos';
 import { maisRecente, pesoNaData } from '../lib/db';
+import type { MetasDoDia } from '../lib/metas';
 import type { Dados } from '../App';
 
-export function Inicio({ dados, aoErro, irParaPerfil }: { dados: Dados; aoErro: (m: string) => void; irParaPerfil: () => void }) {
+export function Inicio({
+  dados,
+  metas,
+  aoErro,
+  irParaPerfil,
+  irParaDieta,
+}: {
+  dados: Dados;
+  metas: MetasDoDia;
+  aoErro: (m: string) => void;
+  irParaPerfil: () => void;
+  irParaDieta: () => void;
+}) {
   const { perfil, aplicacoes, pesos } = dados;
   const hoje = hojeISO();
-  const [form, setForm] = useState<'aplicacao' | 'peso' | null>(null);
+  const [form, setForm] = useState<'aplicacao' | 'peso' | 'comida' | null>(null);
+  const comido = totaisDiario(dados.diario, hoje);
 
   const ultimaAplicacao = maisRecente(aplicacoes);
   const dose = estadoProximaDose(ultimaAplicacao?.data, perfil.intervaloDoseDias, hoje);
@@ -67,6 +83,26 @@ export function Inicio({ dados, aoErro, irParaPerfil }: { dados: Dados; aoErro: 
         {semanas === 0 ? 'Primeira semana de tratamento' : `${semanas} ${semanas === 1 ? 'semana' : 'semanas'} de tratamento`}
       </p>
 
+      <Card>
+        <div className="linha entre" style={{ marginBottom: 10 }}>
+          <div className="card-rotulo" style={{ margin: 0 }}>
+            Calorias de hoje
+          </div>
+          <button className="btn texto" style={{ padding: 0 }} onClick={irParaDieta}>
+            Diário ›
+          </button>
+        </div>
+        <BarrasCalorias kcal={comido.kcal} proteina={comido.proteina} metaKcal={metas.kcal} metaProteina={metas.proteina} />
+        <Botao className="secundario" style={{ marginTop: 12 }} onClick={() => setForm('comida')}>
+          {Icone.mais} Comida
+        </Botao>
+      </Card>
+
+      <Card atraso={0.05}>
+        <div className="card-rotulo">Água</div>
+        <ResumoAgua registros={dados.agua} metaMl={metas.aguaMl} aoErro={aoErro} />
+      </Card>
+
       <motion.div className="hero" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 300, damping: 26 }}>
         <div className="card-rotulo" style={{ color: 'rgb(255 255 255 / 0.8)' }}>
           Peso atual
@@ -90,6 +126,9 @@ export function Inicio({ dados, aoErro, irParaPerfil }: { dados: Dados; aoErro: 
           <small className="suave">{Math.round(fracao * 100)}% do caminho</small>
           <small className="suave">Meta {fmt(perfil.metaKg)} kg</small>
         </div>
+        <motion.button className="btn hero-btn" whileTap={{ scale: 0.96 }} onClick={() => setForm('peso')}>
+          {Icone.balanca} Atualizar peso
+        </motion.button>
       </motion.div>
 
       {metaAtingida ? (
@@ -130,31 +169,22 @@ export function Inicio({ dados, aoErro, irParaPerfil }: { dados: Dados; aoErro: 
         </Card>
       )}
 
-      <Card atraso={0.1}>
-        <div className="linha">
-          <div className="item-icone" style={dose.tipo === 'atrasada' ? { background: 'var(--alerta-suave)', color: 'var(--alerta)' } : undefined}>
-            {Icone.calendario}
-          </div>
-          <div className="item-corpo">
-            <div className="medio" style={{ fontSize: 19, color: doseTexto.cor }}>
-              {doseTexto.titulo}
-            </div>
-            <small className="suave">{doseTexto.detalhe}</small>
-          </div>
+      <Card atraso={0.1} className="dose-compacta">
+        <div className="item-icone" style={dose.tipo === 'atrasada' ? { background: 'var(--alerta-suave)', color: 'var(--alerta)' } : undefined}>
+          {Icone.calendario}
         </div>
+        <div className="item-corpo">
+          <strong style={{ color: doseTexto.cor }}>{doseTexto.titulo}</strong>
+          <small className="suave">{doseTexto.detalhe}</small>
+        </div>
+        <Botao className="pequeno" aria-label="Registrar aplicação" onClick={() => setForm('aplicacao')}>
+          {Icone.mais}
+        </Botao>
       </Card>
-
-      <motion.div className="grade-2" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
-        <Botao onClick={() => setForm('aplicacao')}>
-          {Icone.mais} Aplicação
-        </Botao>
-        <Botao onClick={() => setForm('peso')}>
-          {Icone.mais} Peso
-        </Botao>
-      </motion.div>
 
       <FormAplicacao aberta={form === 'aplicacao'} aoFechar={() => setForm(null)} ultimaDose={ultimaAplicacao?.doseMg} aoErro={aoErro} />
       <FormPeso aberta={form === 'peso'} aoFechar={() => setForm(null)} aoErro={aoErro} />
+      <FormComida aberta={form === 'comida'} aoFechar={() => setForm(null)} data={hoje} aoErro={aoErro} />
     </div>
   );
 }

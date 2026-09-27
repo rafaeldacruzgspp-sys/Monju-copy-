@@ -48,8 +48,24 @@ describe('validar', () => {
 });
 
 describe('lerBackup', () => {
-  it('aceita um backup válido', () => {
-    expect(lerBackup(JSON.stringify(backup)).perfil.nome).toBe('Ana');
+  it('aceita um backup v1 e converte para v2', () => {
+    const b = lerBackup(JSON.stringify(backup));
+    expect(b.perfil.nome).toBe('Ana');
+    expect(b.versao).toBe(2);
+    expect(b.diario).toEqual([]);
+    expect(b.preferencias).toBeNull();
+  });
+  it('aceita um backup v2', () => {
+    const v2 = {
+      ...backup,
+      versao: 2,
+      preferencias: { id: 1, refeicoesPorDia: 4, naoCome: ['ovo'], favoritos: [], ajusteKcal: 0 },
+      planos: [{ inicio: '2026-09-21', semente: 1, geradoEm: '2026-09-21', dias: [], comprados: [] }],
+      diario: [{ id: 1, data: '2026-09-27', categoria: 'proteina', alimentoId: 'ovo', nome: 'Ovo', gramas: 50, kcal: 73, proteina: 6.7, gordura: 4.8, carboidrato: 0.3 }],
+      agua: [{ id: 1, data: '2026-09-27', hora: '08:00', ml: 500 }],
+    };
+    expect(lerBackup(JSON.stringify(v2)).agua[0].ml).toBe(500);
+    expect(() => lerBackup(JSON.stringify({ ...v2, agua: [{ data: '2026-09-27' }] }))).toThrow();
   });
   it('rejeita JSON inválido, app errado ou dados corrompidos', () => {
     expect(() => lerBackup('{')).toThrow('Arquivo de backup inválido');

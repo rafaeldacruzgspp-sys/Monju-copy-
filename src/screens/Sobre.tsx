@@ -72,6 +72,49 @@ export function Sobre({ aoVoltar }: { aoVoltar: () => void }) {
           </p>
         </Card>
 
+        <Card>
+          <div className="card-rotulo">Meta de calorias</div>
+          <p style={{ marginTop: 0 }}>
+            <strong>Gasto em repouso (Mifflin-St Jeor)</strong>: homens 10 × peso + 6,25 × altura − 5 × idade + 5; mulheres o mesmo − 161. A equação com
+            melhor desempenho entre as testadas em pessoas com obesidade.
+          </p>
+          <p>
+            <strong>Gasto do dia</strong> = gasto em repouso × fator de atividade (sedentário 1,2 · leve 1,375 · moderado 1,55 · intenso 1,725).
+          </p>
+          <p>
+            <strong>Meta</strong> = gasto do dia − 500 kcal (ou − 750 kcal quando o prazo pede mais de 0,5 kg/semana), como recomenda a diretriz
+            AHA/ACC/TOS. Nunca abaixo de 1.200 kcal (mulheres) ou 1.500 kcal (homens).
+          </p>
+          <p style={{ marginBottom: 0 }}>
+            <strong>Recalibração</strong>: com 2 semanas de pesos, se a perda real for menos da metade da esperada, a meta cai 100 kcal; se passar de
+            1 kg/semana, sobe 100 kcal (limite de ±300 kcal). O corpo gasta menos à medida que emagrece.
+          </p>
+        </Card>
+
+        <Card>
+          <div className="card-rotulo">Proteína</div>
+          <p style={{ margin: 0 }}>
+            <strong>1,4 g por kg de peso de referência</strong> (o menor entre o peso atual e o peso no IMC 25). A faixa de 1,2–1,6 g/kg ajuda a
+            preservar músculo, que é parte importante do peso perdido com GLP-1. Gordura ≈ 27% das calorias; o restante vem de carboidratos.
+          </p>
+        </Card>
+
+        <Card>
+          <div className="card-rotulo">Água</div>
+          <p style={{ margin: 0 }}>
+            <strong>35 ml × peso atual</strong> (regra prática escolhida para o app; não encontramos uma fonte científica sólida para ela). Para
+            comparação, a EFSA considera adequados 2,0 L/dia (mulheres) e 2,5 L/dia (homens) de água total, incluindo a dos alimentos.
+          </p>
+        </Card>
+
+        <Card>
+          <div className="card-rotulo">Plano e alimentos</div>
+          <p style={{ margin: 0 }}>
+            As calorias e a proteína do dia são divididas entre as refeições; a proteína é dimensionada primeiro e o carboidrato completa as
+            calorias. Valores nutricionais da Tabela Brasileira de Composição de Alimentos (TACO, 4ª edição, NEPA/Unicamp, 2011).
+          </p>
+        </Card>
+
         <div style={{ marginBottom: 14 }}>
           <CartaoEstudos />
         </div>
