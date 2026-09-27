@@ -3,9 +3,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { CATEGORIAS, type CategoriaDiario } from '../data/alimentos';
 import { fmt } from '../lib/calculos';
 import { db, type RegistroDiario } from '../lib/db';
-import { alimentoOuErro, alimentosDaCategoria, buscar, nomeDe, nutrientesDe } from '../lib/taco';
+import { alimentoOuErro, alimentosDaCategoria, buscar, categoriaDe, emojiDe, nomeDe, nutrientesDe } from '../lib/taco';
 import { lerNumero, validar } from '../lib/validacao';
-import { BarraProgresso, Botao, Campo, Folha } from './ui';
+import { Anel, Botao, Campo, EmojiTile, Folha } from './ui';
 
 export function totaisDiario(registros: RegistroDiario[], data: string) {
   const doDia = registros.filter((r) => r.data === data);
@@ -16,28 +16,33 @@ export function totaisDiario(registros: RegistroDiario[], data: string) {
 }
 
 export function BarrasCalorias({ kcal, proteina, metaKcal, metaProteina }: { kcal: number; proteina: number; metaKcal: number; metaProteina: number }) {
+  const acima = kcal > metaKcal;
   return (
-    <div className="coluna">
-      <div>
-        <div className="linha entre" style={{ marginBottom: 6 }}>
-          <span>
-            <strong className="medio">{kcal.toLocaleString('pt-BR')}</strong> <span className="suave">/ {metaKcal.toLocaleString('pt-BR')} kcal</span>
-          </span>
-          <small className={kcal > metaKcal ? 'erro-msg' : 'suave'}>
-            {kcal > metaKcal ? `+${(kcal - metaKcal).toLocaleString('pt-BR')} acima` : `restam ${(metaKcal - kcal).toLocaleString('pt-BR')}`}
+    <div className="anel-bloco">
+      <Anel fracao={kcal / metaKcal} cor={acima ? 'var(--coral)' : 'var(--verde)'}>
+        <span className="num">{kcal.toLocaleString('pt-BR')}</span>
+        <small>de {metaKcal.toLocaleString('pt-BR')} kcal</small>
+      </Anel>
+      <div className="coluna" style={{ flex: 1, gap: 10 }}>
+        <div>
+          <div className="linha entre" style={{ marginBottom: 2 }}>
+            <strong>🔥 Calorias</strong>
+          </div>
+          <small className={acima ? 'erro-msg' : 'suave'}>
+            {acima ? `${(kcal - metaKcal).toLocaleString('pt-BR')} kcal acima` : `restam ${(metaKcal - kcal).toLocaleString('pt-BR')} kcal`}
           </small>
         </div>
-        <BarraProgresso fracao={Math.min(1, kcal / metaKcal)} atraso={0.1} />
-      </div>
-      <div>
-        <div className="linha entre" style={{ marginBottom: 6 }}>
-          <span>
-            <strong>{proteina} g</strong> <span className="suave">/ {metaProteina} g de proteína</span>
-          </span>
+        <div>
+          <div className="linha entre" style={{ marginBottom: 6 }}>
+            <strong>💪 Proteína</strong>
+            <small className="suave">
+              <strong style={{ color: 'var(--texto)' }}>{proteina}</strong>/{metaProteina} g
+            </small>
+          </div>
+          <div className="barra proteina">
+            <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, (proteina / metaProteina) * 100)}%` }} transition={{ duration: 1, delay: 0.2 }} />
+          </div>
           <small className="suave">{proteina >= metaProteina ? 'meta batida ✓' : `faltam ${metaProteina - proteina} g`}</small>
-        </div>
-        <div className="barra proteina">
-          <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min(100, (proteina / metaProteina) * 100)}%` }} transition={{ duration: 1, delay: 0.2 }} />
         </div>
       </div>
     </div>
@@ -132,6 +137,7 @@ export function FormComida({
             <ul className="lista">
               {(resultados ?? alimentosDaCategoria(categoria).map((a) => ({ alimentoId: a.id, nome: a.nome, detalhe: `${nutrientesDe(a.id, 100).kcal} kcal / 100 g` }))).map((r) => (
                 <li key={r.alimentoId} className="item" onClick={() => escolher(r.alimentoId)}>
+                  <EmojiTile emoji={emojiDe(r.alimentoId)} categoria={categoriaDe(r.alimentoId)} pequeno />
                   <div className="item-corpo">
                     <strong>{r.nome}</strong>
                     <small>{r.detalhe}</small>
@@ -145,7 +151,10 @@ export function FormComida({
         ) : (
           <motion.div key="gramas" className="coluna" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }}>
             <div className="linha entre">
-              <strong>{nomeDe(escolhido)}</strong>
+              <div className="linha">
+                <EmojiTile emoji={emojiDe(escolhido)} categoria={categoriaDe(escolhido)} />
+                <strong>{nomeDe(escolhido)}</strong>
+              </div>
               {!editando && (
                 <button type="button" className="btn texto" onClick={() => setEscolhido(null)}>
                   Trocar

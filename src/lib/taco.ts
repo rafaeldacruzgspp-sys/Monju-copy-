@@ -1,5 +1,5 @@
 import tacoJson from '../data/taco.json';
-import { ALIMENTOS, ALIMENTO_POR_ID, type Alimento, type CategoriaDiario } from '../data/alimentos';
+import { ALIMENTOS, ALIMENTO_POR_ID, EMOJI_CATEGORIA_TACO, type Alimento, type CategoriaDiario } from '../data/alimentos';
 
 export interface ItemTaco {
   id: number;
@@ -48,6 +48,30 @@ export function alimentoOuErro(id: string): Alimento {
   const a = ALIMENTO_POR_ID.get(id);
   if (!a) throw new Error(`Alimento ${id} não encontrado`);
   return a;
+}
+
+export function emojiDe(alimentoId: string): string {
+  if (alimentoId.startsWith('taco:')) return EMOJI_CATEGORIA_TACO[tacoPorId(Number(alimentoId.slice(5))).categoria] ?? '🍽️';
+  return ALIMENTO_POR_ID.get(alimentoId)?.emoji ?? '🍽️';
+}
+
+const CATEGORIA_TACO_DIARIO: Record<string, CategoriaDiario> = {
+  'Cereais e derivados': 'carboidrato',
+  'Verduras, hortaliças e derivados': 'salada',
+  'Frutas e derivados': 'fruta',
+  'Gorduras e óleos': 'gordura',
+  'Pescados e frutos do mar': 'proteina',
+  'Carnes e derivados': 'proteina',
+  'Leite e derivados': 'laticinio',
+  'Ovos e derivados': 'proteina',
+  'Produtos açucarados': 'doce',
+  'Leguminosas e derivados': 'carboidrato',
+  'Nozes e sementes': 'gordura',
+};
+
+export function categoriaDe(alimentoId: string): CategoriaDiario {
+  if (alimentoId.startsWith('taco:')) return CATEGORIA_TACO_DIARIO[tacoPorId(Number(alimentoId.slice(5))).categoria] ?? 'outros';
+  return ALIMENTO_POR_ID.get(alimentoId)?.categoria ?? 'outros';
 }
 
 export function nomeDe(alimentoId: string): string {

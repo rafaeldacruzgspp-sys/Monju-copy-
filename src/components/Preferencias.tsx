@@ -98,7 +98,7 @@ export function FormPreferencias({
                           : alternar(favoritos, setFavoritos, naoCome, setNaoCome, a.id)
                       }
                     >
-                      {ativo ? (modo === 'nao' ? '✕ ' : '★ ') : ''}
+                      <span aria-hidden="true">{ativo ? (modo === 'nao' ? '✕' : '★') : a.emoji}</span>
                       {a.nome}
                     </motion.button>
                   );

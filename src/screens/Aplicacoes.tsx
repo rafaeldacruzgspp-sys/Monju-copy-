@@ -1,7 +1,7 @@
 import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { FormAplicacao } from '../components/Formularios';
-import { Botao, Icone } from '../components/ui';
+import { Botao, EmojiTile, Icone } from '../components/ui';
 import { fmt, fmtData } from '../lib/calculos';
 import { maisRecente, type Aplicacao } from '../lib/db';
 import type { Dados } from '../App';
@@ -14,7 +14,9 @@ export function Aplicacoes({ dados, aoErro }: { dados: Dados; aoErro: (m: string
   return (
     <div className="tela">
       <div className="linha entre">
-        <h1 className="titulo-tela">Aplicações</h1>
+        <h1 className="titulo-tela">
+          Suas <em>aplicações</em>
+        </h1>
         <Botao
           className="pequeno"
           aria-label="Nova aplicação"
@@ -47,7 +49,7 @@ export function Aplicacoes({ dados, aoErro }: { dados: Dados; aoErro: (m: string
                     setAberta(true);
                   }}
                 >
-                  <div className="item-icone">{Icone.seringa}</div>
+                  <EmojiTile emoji="💉" categoria="laticinio" />
                   <div className="item-corpo">
                     <strong>{fmt(a.doseMg, a.doseMg % 1 ? 1 : 0)} mg</strong>
                     <small>{a.observacao || 'Sem observações'}</small>

@@ -20,6 +20,16 @@ import { maisRecente, pesoNaData } from '../lib/db';
 import type { MetasDoDia } from '../lib/metas';
 import type { Dados } from '../App';
 
+function saudacao(): string {
+  const h = new Date().getHours();
+  return h < 12 ? 'Bom dia' : h < 18 ? 'Boa tarde' : 'Boa noite';
+}
+
+function emojiSaudacao(): string {
+  const h = new Date().getHours();
+  return h < 12 ? '☀️' : h < 18 ? '🌤️' : '🌙';
+}
+
 export function Inicio({
   dados,
   metas,
@@ -77,7 +87,10 @@ export function Inicio({
   return (
     <div className="tela">
       <motion.h1 className="titulo-tela" initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}>
-        Olá, {perfil.nome.split(' ')[0]}
+        {saudacao()}, <em>{perfil.nome.trim().split(/\s+/)[0]}</em>{' '}
+        <motion.span className="saudacao-emoji" animate={{ rotate: [0, 14, -8, 14, 0] }} transition={{ delay: 0.6, duration: 1.2 }}>
+          {emojiSaudacao()}
+        </motion.span>
       </motion.h1>
       <p className="subtitulo">
         {semanas === 0 ? 'Primeira semana de tratamento' : `${semanas} ${semanas === 1 ? 'semana' : 'semanas'} de tratamento`}
@@ -86,7 +99,7 @@ export function Inicio({
       <Card>
         <div className="linha entre" style={{ marginBottom: 10 }}>
           <div className="card-rotulo" style={{ margin: 0 }}>
-            Calorias de hoje
+            🍽️ Calorias de hoje
           </div>
           <button className="btn texto" style={{ padding: 0 }} onClick={irParaDieta}>
             Diário ›
@@ -99,13 +112,13 @@ export function Inicio({
       </Card>
 
       <Card atraso={0.05}>
-        <div className="card-rotulo">Água</div>
+        <div className="card-rotulo">💧 Água de hoje</div>
         <ResumoAgua registros={dados.agua} metaMl={metas.aguaMl} aoErro={aoErro} />
       </Card>
 
       <motion.div className="hero" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ type: 'spring', stiffness: 300, damping: 26 }}>
         <div className="card-rotulo" style={{ color: 'rgb(255 255 255 / 0.8)' }}>
-          Peso atual
+          ⚖️ Peso atual
         </div>
         <div className="linha entre" style={{ alignItems: 'flex-end' }}>
           <div className="grande">

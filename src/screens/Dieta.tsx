@@ -4,22 +4,22 @@ import { GARRAFAS, Garrafa, Ultimos7Dias, adicionarAgua, desfazerAgua, litros, t
 import { BarrasCalorias, FormComida, totaisDiario } from '../components/Comida';
 import { GerandoPlano } from '../components/GerandoPlano';
 import { FormPreferencias } from '../components/Preferencias';
-import { Botao, Campo, Card, Folha, Icone } from '../components/ui';
+import { Botao, Campo, Card, EmojiTile, Folha, Icone } from '../components/ui';
 import { CATEGORIAS, type CategoriaDiario } from '../data/alimentos';
 import { fmtData, hojeISO, somarDias } from '../lib/calculos';
 import { db, type RegistroDiario } from '../lib/db';
 import { segundaDaSemana, type MetasDoDia } from '../lib/metas';
 import { metaAgua } from '../lib/nutricao';
 import { VERSAO_GERADOR, gerarSemana, listaDeCompras, quantidadeCompra, totaisDia, trocarItem, type Preferencias } from '../lib/plano';
-import { descreverPorcao, nomeDe } from '../lib/taco';
+import { categoriaDe, descreverPorcao, emojiDe, nomeDe } from '../lib/taco';
 import { lerNumero, validar } from '../lib/validacao';
 import type { Dados } from '../App';
 
 type Secao = 'plano' | 'diario' | 'agua';
 const SECOES: { id: Secao; nome: string }[] = [
-  { id: 'plano', nome: 'Plano' },
-  { id: 'diario', nome: 'Diário' },
-  { id: 'agua', nome: 'Água' },
+  { id: 'plano', nome: '🗓️ Plano' },
+  { id: 'diario', nome: '📒 Diário' },
+  { id: 'agua', nome: '💧 Água' },
 ];
 
 export function Dieta({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDia; aoErro: (m: string) => void }) {
@@ -41,9 +41,11 @@ export function Dieta({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDi
   return (
     <div className="tela">
       <div className="linha entre">
-        <h1 className="titulo-tela">Dieta</h1>
+        <h1 className="titulo-tela">
+          Sua <em>dieta</em>
+        </h1>
         <Botao className="secundario pequeno" onClick={() => setEditandoPref(true)}>
-          Preferências
+          ⚙️ Preferências
         </Botao>
       </div>
 
@@ -74,6 +76,15 @@ export function Dieta({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDi
 // ---------- Plano ----------
 
 const DIAS = ['seg', 'ter', 'qua', 'qui', 'sex', 'sáb', 'dom'];
+
+const EMOJI_REFEICAO: Record<string, string> = {
+  'Café da manhã': '☕',
+  'Lanche da manhã': '🍎',
+  Almoço: '🍽️',
+  'Lanche da tarde': '🧁',
+  Jantar: '🌙',
+  Ceia: '🌛',
+};
 
 function Plano({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDia; aoErro: (m: string) => void }) {
   const hoje = hojeISO();
@@ -144,18 +155,21 @@ function Plano({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDia; aoEr
     <div>
       <AnimatePresence>{telaGerando && <GerandoPlano nome={primeiroNome} sexo={dados.perfil.sexo} aoConcluir={() => setTelaGerando(false)} />}</AnimatePresence>
       <Card>
-        <div className="card-rotulo">Metas do dia</div>
+        <div className="card-rotulo">🎯 Metas do dia</div>
         <div className="metas">
           <div>
-            <strong className="medio">{metas.kcal.toLocaleString('pt-BR')}</strong>
+            <span className="meta-emoji">🔥</span>
+            <strong>{metas.kcal.toLocaleString('pt-BR')}</strong>
             <small className="suave">kcal</small>
           </div>
           <div>
-            <strong className="medio">{metas.proteina} g</strong>
+            <span className="meta-emoji">💪</span>
+            <strong>{metas.proteina} g</strong>
             <small className="suave">proteína</small>
           </div>
           <div>
-            <strong className="medio">{litros(metas.aguaMl)}</strong>
+            <span className="meta-emoji">💧</span>
+            <strong>{litros(metas.aguaMl)}</strong>
             <small className="suave">água</small>
           </div>
         </div>
@@ -206,30 +220,44 @@ function Plano({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDia; aoEr
           {diaPlano?.refeicoes.map((r, ri) => {
             const t = totaisDia({ refeicoes: [r] });
             return (
-              <div key={ri} className="card refeicao">
-                <div className="linha entre">
-                  <div>
-                    <strong style={{ fontSize: 17 }}>{r.nome}</strong> <small className="suave">{r.horario}</small>
+              <motion.div
+                key={ri}
+                className="card refeicao"
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: ri * 0.05, type: 'spring', stiffness: 320, damping: 28 }}
+              >
+                <div className="refeicao-topo">
+                  <span className="refeicao-emoji" aria-hidden="true">
+                    {EMOJI_REFEICAO[r.nome] ?? '🍽️'}
+                  </span>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <strong>{r.nome}</strong>
+                    <small className="suave">🕒 {r.horario}</small>
                   </div>
-                  <small className="suave">
-                    {t.kcal} kcal · {t.proteina} g prot.
-                  </small>
+                  <div className="coluna" style={{ gap: 4, alignItems: 'flex-end' }}>
+                    <span className="pill">🔥 {t.kcal} kcal</span>
+                    <span className="pill">💪 {t.proteina} g</span>
+                  </div>
                 </div>
                 {r.faltando && <small className="erro-msg">Sem opções de {r.faltando.join(', ')} — revise suas preferências.</small>}
                 <ul className="lista">
                   {r.itens.map((it, ii) => (
-                    <motion.li key={`${it.alimentoId}-${ii}`} layout className="item" style={{ cursor: 'default' }} initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                    <motion.li key={`${it.alimentoId}-${ii}`} layout className="item" style={{ cursor: 'default' }} initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }}>
+                      <EmojiTile emoji={emojiDe(it.alimentoId)} categoria={categoriaDe(it.alimentoId)} />
                       <div className="item-corpo">
-                        <strong>{nomeDe(it.alimentoId)}</strong>
-                        <small>{it.aVontade ? 'à vontade' : descreverPorcao(it.alimentoId, it.gramas)}</small>
+                        <strong>
+                          {nomeDe(it.alimentoId)} {categoriaDe(it.alimentoId) === 'doce' && <span className="pill doce">docinho do dia</span>}
+                        </strong>
+                        <small>{it.aVontade ? '🥗 à vontade' : descreverPorcao(it.alimentoId, it.gramas)}</small>
                       </div>
-                      <button type="button" className="btn texto" aria-label={`Trocar ${nomeDe(it.alimentoId)}`} onClick={() => trocar(ri, ii)}>
-                        ⇄ trocar
-                      </button>
+                      <motion.button whileTap={{ scale: 0.9, rotate: 180 }} type="button" className="btn-trocar" aria-label={`Trocar ${nomeDe(it.alimentoId)}`} onClick={() => trocar(ri, ii)}>
+                        ⇄
+                      </motion.button>
                     </motion.li>
                   ))}
                 </ul>
-              </div>
+              </motion.div>
             );
           })}
         </motion.div>
@@ -237,7 +265,7 @@ function Plano({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDia; aoEr
 
       <div className="coluna" style={{ marginTop: 4 }}>
         <Botao className="secundario" onClick={() => setCompras(true)}>
-          🛒 Lista de compras
+          🛒 Lista de compras da semana
         </Botao>
         <Botao
           className={confirmarNova ? 'perigo' : 'secundario'}
@@ -265,6 +293,7 @@ function Plano({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDia; aoEr
                       <motion.span className={`check ${ok ? 'ok' : ''}`} animate={{ scale: ok ? [1, 1.25, 1] : 1 }}>
                         {ok ? '✓' : ''}
                       </motion.span>
+                      <EmojiTile emoji={emojiDe(i.alimentoId)} categoria={categoriaDe(i.alimentoId)} pequeno />
                       <div className="item-corpo" style={{ textDecoration: ok ? 'line-through' : undefined, opacity: ok ? 0.5 : 1 }}>
                         <strong>{nomeDe(i.alimentoId)}</strong>
                       </div>
@@ -307,7 +336,7 @@ function Diario({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDia; aoE
 
       <div className="grade-categorias">
         {CATEGORIAS.map((c) => (
-          <motion.button key={c.id} whileTap={{ scale: 0.94 }} className="categoria" onClick={() => setForm({ categoria: c.id })}>
+          <motion.button key={c.id} whileTap={{ scale: 0.94 }} className={`categoria cat-${c.id}`} onClick={() => setForm({ categoria: c.id })}>
             <span style={{ fontSize: 26 }}>{c.emoji}</span>
             <span>{c.nome}</span>
           </motion.button>
@@ -325,6 +354,7 @@ function Diario({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDia; aoE
                 .filter((r) => r.categoria === c.id)
                 .map((r) => (
                   <motion.li key={r.id} layout className="item" initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, height: 0 }} onClick={() => setForm({ editando: r })}>
+                    <EmojiTile emoji={emojiDe(r.alimentoId)} categoria={r.categoria} pequeno />
                     <div className="item-corpo">
                       <strong>{r.nome}</strong>
                       <small>
@@ -404,6 +434,7 @@ function AguaTela({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDia; a
           <ul className="lista">
             {deHoje.map((r) => (
               <li key={r.id} className="item" style={{ cursor: 'default' }}>
+                <EmojiTile emoji="💧" categoria="laticinio" pequeno />
                 <div className="item-corpo">
                   <strong>{litros(r.ml)}</strong>
                   <small>{r.hora}</small>

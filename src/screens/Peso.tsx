@@ -2,7 +2,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useState } from 'react';
 import { CartesianGrid, Line, LineChart, ReferenceLine, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { FormPeso } from '../components/Formularios';
-import { Botao, Card, Icone } from '../components/ui';
+import { Botao, Card, EmojiTile, Icone } from '../components/ui';
 import { fmt, fmtData } from '../lib/calculos';
 import type { RegistroPeso } from '../lib/db';
 import type { Dados } from '../App';
@@ -22,7 +22,9 @@ export function Peso({ dados, aoErro }: { dados: Dados; aoErro: (m: string) => v
   return (
     <div className="tela">
       <div className="linha entre">
-        <h1 className="titulo-tela">Peso</h1>
+        <h1 className="titulo-tela">
+          Seu <em>peso</em>
+        </h1>
         <Botao
           className="pequeno"
           aria-label="Novo peso"
@@ -36,7 +38,7 @@ export function Peso({ dados, aoErro }: { dados: Dados; aoErro: (m: string) => v
       </div>
 
       <Card>
-        <div className="card-rotulo">Evolução</div>
+        <div className="card-rotulo">📈 Evolução</div>
         {pontos.length < 2 ? (
           <div className="vazio">Registre pelo menos dois pesos para ver o gráfico.</div>
         ) : (
@@ -95,7 +97,7 @@ export function Peso({ dados, aoErro }: { dados: Dados; aoErro: (m: string) => v
                       setAberta(true);
                     }}
                   >
-                    <div className="item-icone">{Icone.balanca}</div>
+                    <EmojiTile emoji="⚖️" categoria="salada" />
                     <div className="item-corpo">
                       <strong>{fmt(p.kg)} kg</strong>
                       <small>{fmtData(p.data, { day: '2-digit', month: 'long', year: 'numeric' })}</small>
