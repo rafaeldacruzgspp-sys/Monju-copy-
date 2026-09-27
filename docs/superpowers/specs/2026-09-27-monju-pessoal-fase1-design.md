@@ -135,7 +135,7 @@ superior exclusiva (ex.: 24,99 → Eutrofia; 25,0 → Sobrepeso).
 ### 4.3 Alerta de ritmo e sugestões
 
 - Limite seguro: **1,0 kg/semana**. Esse limite vem de diretrizes clínicas usuais; nenhum
-  artigo específico foi levantado para esse número (ver 8.3).
+  artigo específico foi levantado para esse número (ver 8.4).
 - Se `ritmo > 1,0`, o app mostra: "Esse prazo exige X kg por semana, acima do ritmo
   considerado seguro (até 1 kg/semana)." e sugere:
   - **Prazo seguro:** `ceil((atual − meta) ÷ 1,0)` semanas, somente se ≤ 12;
@@ -259,12 +259,32 @@ Tela "O que os estudos mostram" e "Sobre os cálculos": referências [1]–[4].
   a errata deve ser conferida antes de usar qualquer número dele.
 - **Alimentos:** Tabela Brasileira de Composição de Alimentos (TACO/Unicamp).
 
-### 8.3 Pendência
+### 8.3 Prévia da Fase 2: como a dieta é montada sem API
+
+Motor de regras determinístico, 100% no aparelho:
+
+1. **Gasto diário:** Mifflin-St Jeor × fator de atividade.
+2. **Meta calórica:** gasto − déficit do prazo (limitado ao ritmo seguro), nunca abaixo do
+   piso mínimo. Proteína definida primeiro (1,2–1,6 g/kg); o restante é dividido entre
+   carboidrato e gordura.
+3. **Base de alimentos:** Tabela TACO embutida (JSON), com cada alimento marcado com grupo
+   (proteína, carboidrato, leguminosa, fruta, verdura, laticínio, gordura) e medida caseira.
+4. **Preferências:** mini-entrevista (alimentos rejeitados, restrições, nº de refeições,
+   favoritos); os alimentos rejeitados são removidos da base.
+5. **Montagem:** moldes por refeição (ex.: almoço = proteína + carboidrato + leguminosa +
+   verduras); calorias e proteína do dia distribuídas por refeição; alimentos escolhidos com
+   rodízio para evitar repetição; porções ajustadas à meta e arredondadas para medidas caseiras.
+6. **Trocar:** substitui um item por outro do mesmo grupo com calorias e proteína
+   equivalentes (lista de substituições).
+7. **Recalibração semanal:** compara a perda prevista com a real e ajusta as calorias,
+   respeitando o piso.
+
+### 8.4 Pendência
 
 O limite de 1 kg/semana (4.3) vem de diretrizes clínicas usuais; uma fonte formal pode ser
 levantada antes ou durante a Fase 2.
 
-### 8.4 Referências
+### 8.5 Referências
 
 1. Jastreboff, A. M., et al. (2022). Tirzepatide once weekly for the treatment of obesity. *NEJM*, 387(3), 205–216. https://doi.org/10.1056/nejmoa2206038
 2. Müllertz, A. L. O., et al. (2024). Potent incretin-based therapy for obesity: a systematic review and meta-analysis. *Obesity Reviews*, 25(5). https://doi.org/10.1111/obr.13717
