@@ -241,3 +241,39 @@ export const Icone = {
   ),
   livro: svg(<path d="M4 4h6a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4zM20 4h-6a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h7z" />),
 };
+
+/** Ladrilho colorido com o emoji do alimento (cor pela categoria). */
+export function EmojiTile({ emoji, categoria, pequeno }: { emoji: string; categoria?: string; pequeno?: boolean }) {
+  return (
+    <span className={`emoji-tile ${pequeno ? 'pequeno' : ''} ${categoria ? `cat-${categoria}` : ''}`} aria-hidden="true">
+      {emoji}
+    </span>
+  );
+}
+
+/** Anel de progresso (0..1) com conteúdo no centro. */
+export function Anel({ fracao, cor = 'var(--verde)', tamanho = 118, espessura = 12, children }: { fracao: number; cor?: string; tamanho?: number; espessura?: number; children?: ReactNode }) {
+  const r = (tamanho - espessura) / 2;
+  const c = 2 * Math.PI * r;
+  return (
+    <div className="anel" style={{ width: tamanho, height: tamanho }}>
+      <svg width={tamanho} height={tamanho} aria-hidden="true">
+        <circle cx={tamanho / 2} cy={tamanho / 2} r={r} fill="none" stroke="color-mix(in srgb, var(--texto) 8%, transparent)" strokeWidth={espessura} />
+        <motion.circle
+          cx={tamanho / 2}
+          cy={tamanho / 2}
+          r={r}
+          fill="none"
+          stroke={cor}
+          strokeWidth={espessura}
+          strokeLinecap="round"
+          strokeDasharray={c}
+          initial={{ strokeDashoffset: c }}
+          animate={{ strokeDashoffset: c * (1 - Math.min(1, Math.max(0, fracao))) }}
+          transition={{ duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
+        />
+      </svg>
+      <div className="anel-centro">{children}</div>
+    </div>
+  );
+}

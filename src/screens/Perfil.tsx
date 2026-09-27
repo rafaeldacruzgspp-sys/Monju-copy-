@@ -90,7 +90,9 @@ export function Perfil({ dados, aoErro, abrirSobre }: { dados: Dados; aoErro: (m
 
   return (
     <div className="tela">
-      <h1 className="titulo-tela">Perfil</h1>
+      <h1 className="titulo-tela">
+        Seu <em>perfil</em>
+      </h1>
 
       <Card>
         <div className="card-rotulo">Meta</div>

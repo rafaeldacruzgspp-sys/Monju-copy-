@@ -10,6 +10,10 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
+      workbox: {
+        // Fontes: só o subconjunto latino, para funcionar offline sem baixar os demais.
+        globPatterns: ['**/*.{js,css,html,png,svg}', '**/fraunces-latin-full-normal-*.woff2', '**/nunito-latin-wght-normal-*.woff2'],
+      },
       manifest: {
         name: 'Monju Pessoal',
         short_name: 'Monju',
