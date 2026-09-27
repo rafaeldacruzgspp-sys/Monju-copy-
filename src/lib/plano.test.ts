@@ -63,6 +63,30 @@ describe('gerarSemana', () => {
   });
 });
 
+describe('café e docinho', () => {
+  it.each([3, 4, 5, 6] as const)('%i refeições: um docinho por dia e bebida no café', (n) => {
+    const semana = gerarSemana(metas, { ...pref, refeicoesPorDia: n }, 21);
+    for (const dia of semana) {
+      const itens = dia.refeicoes.flatMap((r) => r.itens.map((i) => ALIMENTOS.find((a) => a.id === i.alimentoId)!));
+      expect(itens.filter((a) => a.papeis.includes('doce') && a.categoria === 'doce')).toHaveLength(1);
+      const cafe = dia.refeicoes[0].itens.map((i) => ALIMENTOS.find((a) => a.id === i.alimentoId)!);
+      expect(cafe.some((a) => a.papeis.includes('bebida'))).toBe(true);
+    }
+  });
+  it('o docinho cabe na meta mesmo no piso de 1.200 kcal', () => {
+    for (const dia of gerarSemana({ kcal: 1200, proteina: 80 }, { ...pref, refeicoesPorDia: 3 }, 4)) {
+      const t = totaisDia(dia);
+      expect(t.kcal).toBeLessThanOrEqual(1200 * 1.1);
+    }
+  });
+  it('dá para tirar os docinhos marcando "não como"', () => {
+    const naoCome = ALIMENTOS.filter((a) => a.papeis.includes('doce')).map((a) => a.id);
+    const semana = gerarSemana(metas, { ...pref, naoCome }, 2);
+    expect(semana.flatMap((d) => d.refeicoes.flatMap((r) => r.faltando ?? []))).toEqual([]);
+    expect(semana.flatMap((d) => d.refeicoes.flatMap((r) => r.itens)).some((i) => naoCome.includes(i.alimentoId))).toBe(false);
+  });
+});
+
 describe('trocarItem', () => {
   it('troca por outro alimento do mesmo papel e mantém as metas', () => {
     const [dia] = gerarSemana(metas, pref, 5);

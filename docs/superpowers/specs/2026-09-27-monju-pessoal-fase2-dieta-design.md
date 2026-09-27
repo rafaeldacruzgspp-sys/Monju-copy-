@@ -256,3 +256,18 @@ Referências novas:
 16. NEPA/UNICAMP (2011). Tabela Brasileira de Composição de Alimentos (TACO), 4ª edição revisada e ampliada.
 
 Os números [8] e [11] referem-se às referências da especificação da Fase 1.
+
+## 11. Atualização (pedido do usuário após a publicação)
+
+- **Mais queijos e bebidas**: muçarela, prato e minas meia cura no café da manhã; parmesão no diário;
+  leite integral, leite desnatado e café com leite. Café da manhã ganha uma vaga de **bebida**
+  (café, leite ou café com leite).
+- **Docinho do dia**: todo dia entra 1 docinho de porção fixa (Trento, Nutella B-ready, bolo de
+  pote, brigadeiro, Bis, chocolate ao leite/meio amargo, paçoca, pé-de-moleque, doce de leite) no
+  lanche da tarde ou, sem lanche, como sobremesa do almoço; o equilíbrio do dia compensa as
+  calorias. Marcar todos como "não como" remove o docinho sem aviso de falta.
+- **Itens fora da TACO** (marcas e leite líquido) usam valores aproximados de rótulos típicos
+  (campo `rotulo`), sinalizados como "valor aproximado" na busca.
+- **Tela de geração**: ao gerar o plano, sobreposição "Montando o plano adaptado da <nome> —
+  seguindo artigos científicos modernos" com barra de 0 a 100% (~3,5 s) e as etapas do cálculo.
+- Nova categoria de diário **Docinhos**.

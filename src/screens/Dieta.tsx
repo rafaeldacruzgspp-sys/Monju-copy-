@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { GARRAFAS, Garrafa, Ultimos7Dias, adicionarAgua, desfazerAgua, litros, totalDoDia } from '../components/Agua';
 import { BarrasCalorias, FormComida, totaisDiario } from '../components/Comida';
+import { GerandoPlano } from '../components/GerandoPlano';
 import { FormPreferencias } from '../components/Preferencias';
 import { Botao, Campo, Card, Folha, Icone } from '../components/ui';
 import { CATEGORIAS, type CategoriaDiario } from '../data/alimentos';
@@ -9,7 +10,7 @@ import { fmtData, hojeISO, somarDias } from '../lib/calculos';
 import { db, type RegistroDiario } from '../lib/db';
 import { segundaDaSemana, type MetasDoDia } from '../lib/metas';
 import { metaAgua } from '../lib/nutricao';
-import { gerarSemana, listaDeCompras, quantidadeCompra, totaisDia, trocarItem, type Preferencias } from '../lib/plano';
+import { VERSAO_GERADOR, gerarSemana, listaDeCompras, quantidadeCompra, totaisDia, trocarItem, type Preferencias } from '../lib/plano';
 import { descreverPorcao, nomeDe } from '../lib/taco';
 import { lerNumero, validar } from '../lib/validacao';
 import type { Dados } from '../App';
@@ -86,12 +87,16 @@ function Plano({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDia; aoEr
   const prefPlano: Preferencias = { refeicoesPorDia: pref.refeicoesPorDia, naoCome: pref.naoCome, favoritos: pref.favoritos };
   const metasPlano = { kcal: metas.kcal, proteina: metas.proteina };
   const gerando = useRef(false);
+  const [telaGerando, setTelaGerando] = useState(false);
+  const primeiroNome = dados.perfil.nome.trim().split(/\s+/)[0];
 
   // Gera automaticamente quando não há plano para a semana ou as preferências mudaram.
   const assinatura = JSON.stringify(prefPlano);
   const desatualizado = !!plano?.preferencias && plano.preferencias !== assinatura;
+  const geradorAntigo = !!plano && (plano.versao ?? 1) < VERSAO_GERADOR;
 
   async function gerar(semente = Date.now() % 2_147_483_647) {
+    setTelaGerando(true);
     try {
       await db.planos.put({
         inicio,
@@ -100,6 +105,7 @@ function Plano({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDia; aoEr
         dias: gerarSemana(metasPlano, prefPlano, semente),
         comprados: [],
         preferencias: assinatura,
+        versao: VERSAO_GERADOR,
       });
     } catch {
       aoErro('Não foi possível salvar o plano. Tente novamente.');
@@ -136,6 +142,7 @@ function Plano({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDia; aoEr
 
   return (
     <div>
+      <AnimatePresence>{telaGerando && <GerandoPlano nome={primeiroNome} sexo={dados.perfil.sexo} aoConcluir={() => setTelaGerando(false)} />}</AnimatePresence>
       <Card>
         <div className="card-rotulo">Metas do dia</div>
         <div className="metas">
@@ -160,6 +167,15 @@ function Plano({ dados, metas, aoErro }: { dados: Dados; metas: MetasDoDia; aoEr
           </small>
         )}
       </Card>
+
+      {geradorAntigo && !desatualizado && (
+        <div className="info" style={{ marginBottom: 14 }}>
+          <strong>Novidades no plano: café da manhã com bebida e um docinho por dia 🍫</strong>
+          <Botao className="pequeno" style={{ marginTop: 8 }} onClick={() => gerar()}>
+            Gerar a semana com as novidades
+          </Botao>
+        </div>
+      )}
 
       {desatualizado && (
         <div className="aviso" style={{ marginBottom: 14 }}>

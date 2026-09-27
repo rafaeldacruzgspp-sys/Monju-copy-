@@ -73,13 +73,16 @@ describe('recalibração', () => {
 });
 
 describe('base de alimentos', () => {
-  it('todo alimento da lista enxuta existe na TACO com calorias', () => {
+  it('todo alimento da lista enxuta tem TACO ou rótulo, com calorias', () => {
     for (const a of ALIMENTOS) {
-      const t = TACO.find((x) => x.id === a.taco);
-      expect(t, a.id).toBeDefined();
-      if (a.id !== 'cafe') expect(t!.kcal, a.id).toBeGreaterThan(0);
+      expect(!!a.taco !== !!a.rotulo, `${a.id}: precisa de taco OU rotulo`).toBe(true);
+      const kcal = a.rotulo ? a.rotulo.kcal : TACO.find((x) => x.id === a.taco)?.kcal;
+      expect(kcal, a.id).toBeGreaterThan(0);
       expect(a.min <= a.porcao && a.porcao <= a.max, a.id).toBe(true);
     }
+  });
+  it('ids únicos', () => {
+    expect(new Set(ALIMENTOS.map((a) => a.id)).size).toBe(ALIMENTOS.length);
   });
   it('nutrientes por gramas', () => {
     expect(nutrientesDe('frango-peito', 150).kcal).toBe(Math.round(159 * 1.5));
@@ -92,6 +95,7 @@ describe('base de alimentos', () => {
   });
   it('descreve porções', () => {
     expect(descreverPorcao('ovo', 100)).toBe('2 ovos (100 g)');
+    expect(descreverPorcao('leite-integral', 200)).toBe('1 copo (200 ml)');
     expect(descreverPorcao('feijao-carioca', 90)).toBe('90 g · 1 concha');
     expect(descreverPorcao('iogurte', 340)).toBe('340 g · 2× 1 pote');
     expect(descreverPorcao('batata-doce', 180)).toBe('180 g · 4,5× 1 fatia média');

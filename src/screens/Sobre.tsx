@@ -111,7 +111,10 @@ export function Sobre({ aoVoltar }: { aoVoltar: () => void }) {
           <div className="card-rotulo">Plano e alimentos</div>
           <p style={{ margin: 0 }}>
             As calorias e a proteína do dia são divididas entre as refeições; a proteína é dimensionada primeiro e o carboidrato completa as
-            calorias. Valores nutricionais da Tabela Brasileira de Composição de Alimentos (TACO, 4ª edição, NEPA/Unicamp, 2011).
+            calorias. Todo dia entra um docinho de porção fixa (no lanche da tarde ou como sobremesa do almoço), e o restante do dia é ajustado
+            para ele caber na meta. Valores nutricionais da Tabela Brasileira de Composição de Alimentos (TACO, 4ª edição, NEPA/Unicamp, 2011);
+            produtos que não estão na TACO (Trento, Nutella B-ready, Bis, bolo de pote, brigadeiro e leite líquido) usam valores aproximados de
+            rótulos típicos.
           </p>
         </Card>
 

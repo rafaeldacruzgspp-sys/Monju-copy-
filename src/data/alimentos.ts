@@ -1,7 +1,8 @@
 // Lista enxuta de alimentos (seção 6 da especificação da Fase 2).
-// Valores nutricionais vêm da TACO 4ª edição pelo id (`taco`); aqui ficam só os dados de uso.
+// Valores nutricionais vêm da TACO 4ª edição pelo id (`taco`). Produtos que não estão na TACO
+// (marcas e leite líquido) usam `rotulo`: valores aproximados por 100 g/ml de rótulos típicos.
 
-export type CategoriaDiario = 'proteina' | 'carboidrato' | 'salada' | 'fruta' | 'laticinio' | 'gordura' | 'outros';
+export type CategoriaDiario = 'proteina' | 'carboidrato' | 'salada' | 'fruta' | 'laticinio' | 'gordura' | 'doce' | 'outros';
 
 export const CATEGORIAS: { id: CategoriaDiario; nome: string; emoji: string }[] = [
   { id: 'proteina', nome: 'Proteína', emoji: '🍗' },
@@ -10,6 +11,7 @@ export const CATEGORIAS: { id: CategoriaDiario; nome: string; emoji: string }[] 
   { id: 'fruta', nome: 'Frutas', emoji: '🍎' },
   { id: 'laticinio', nome: 'Laticínios', emoji: '🥛' },
   { id: 'gordura', nome: 'Gorduras', emoji: '🫒' },
+  { id: 'doce', nome: 'Docinhos', emoji: '🍫' },
   { id: 'outros', nome: 'Outros', emoji: '🍯' },
 ];
 
@@ -23,12 +25,17 @@ export type Papel =
   | 'fruta'
   | 'laticinio'
   | 'salada'
-  | 'gordura';
+  | 'gordura'
+  | 'bebida' // café da manhã
+  | 'doce'; // docinho do dia
 
 export interface Alimento {
   id: string;
   nome: string;
-  taco: number;
+  /** Id na TACO; ausente quando os valores vêm de `rotulo`. */
+  taco?: number;
+  /** Valores aproximados por 100 g (ou 100 ml) de rótulos típicos, para itens fora da TACO. */
+  rotulo?: { kcal: number; proteina: number; gordura: number; carboidrato: number };
   categoria: CategoriaDiario;
   papeis: Papel[];
   /** Porção padrão em gramas. */
@@ -68,7 +75,13 @@ export const ALIMENTOS: Alimento[] = [
   // Laticínios
   a({ id: 'queijo-minas', nome: 'Queijo minas frescal', taco: 461, categoria: 'laticinio', papeis: ['proteinaCafe', 'laticinio'], porcao: 30, min: 20, max: 90, medida: { g: 30, nome: '1 fatia média' } }),
   a({ id: 'ricota', nome: 'Ricota', taco: 469, categoria: 'laticinio', papeis: ['proteinaCafe', 'laticinio'], porcao: 40, min: 20, max: 120, medida: { g: 30, nome: '1 fatia' } }),
-  a({ id: 'mozarela', nome: 'Queijo mozarela', taco: 463, categoria: 'laticinio', papeis: [], porcao: 20, min: 10, max: 60, medida: { g: 15, nome: '1 fatia' } }),
+  a({ id: 'mozarela', nome: 'Queijo muçarela', taco: 463, categoria: 'laticinio', papeis: ['proteinaCafe'], porcao: 30, min: 15, max: 75, medida: { g: 15, nome: '1 fatia' } }),
+  a({ id: 'queijo-prato', nome: 'Queijo prato', taco: 467, categoria: 'laticinio', papeis: ['proteinaCafe'], porcao: 30, min: 15, max: 75, medida: { g: 15, nome: '1 fatia' } }),
+  a({ id: 'queijo-meia-cura', nome: 'Queijo minas meia cura', taco: 462, categoria: 'laticinio', papeis: ['proteinaCafe'], porcao: 30, min: 15, max: 90, medida: { g: 30, nome: '1 fatia média' } }),
+  a({ id: 'parmesao', nome: 'Queijo parmesão ralado', taco: 464, categoria: 'laticinio', papeis: [], porcao: 10, min: 5, max: 30, medida: { g: 5, nome: '1 colher de sopa' } }),
+  a({ id: 'leite-integral', nome: 'Leite integral', rotulo: { kcal: 58, proteina: 3.0, gordura: 3.0, carboidrato: 4.6 }, categoria: 'laticinio', papeis: ['bebida', 'laticinio'], porcao: 200, min: 100, max: 300, unidade: { g: 200, nome: 'copo (200 ml)', plural: 'copos (200 ml)' } }),
+  a({ id: 'leite-desnatado', nome: 'Leite desnatado', rotulo: { kcal: 35, proteina: 3.1, gordura: 0, carboidrato: 4.9 }, categoria: 'laticinio', papeis: ['bebida', 'laticinio'], porcao: 200, min: 100, max: 300, unidade: { g: 200, nome: 'copo (200 ml)', plural: 'copos (200 ml)' } }),
+  a({ id: 'cafe-com-leite', nome: 'Café com leite (meio a meio)', rotulo: { kcal: 34, proteina: 1.9, gordura: 1.6, carboidrato: 3.1 }, categoria: 'laticinio', papeis: ['bebida'], porcao: 200, min: 200, max: 200, unidade: { g: 200, nome: 'xícara grande (200 ml)', plural: 'xícaras grandes (200 ml)' } }),
   a({ id: 'iogurte', nome: 'Iogurte natural', taco: 448, categoria: 'laticinio', papeis: ['laticinio'], porcao: 170, min: 100, max: 340, medida: { g: 170, nome: '1 pote' } }),
   a({ id: 'iogurte-desnatado', nome: 'Iogurte natural desnatado', taco: 449, categoria: 'laticinio', papeis: ['laticinio'], porcao: 170, min: 100, max: 340, medida: { g: 170, nome: '1 pote' } }),
   a({ id: 'leite-po', nome: 'Leite desnatado em pó', taco: 456, categoria: 'laticinio', papeis: ['laticinio'], porcao: 20, min: 10, max: 40, medida: { g: 20, nome: '2 colheres de sopa (1 copo)' } }),
@@ -141,7 +154,19 @@ export const ALIMENTOS: Alimento[] = [
 
   // Outros
   a({ id: 'mel', nome: 'Mel', taco: 507, categoria: 'outros', papeis: [], porcao: 10, min: 5, max: 40, medida: { g: 10, nome: '1 colher de sobremesa' } }),
-  a({ id: 'cafe', nome: 'Café sem açúcar', taco: 471, categoria: 'outros', papeis: [], porcao: 100, min: 50, max: 400, medida: { g: 50, nome: '1 xícara' } }),
+  a({ id: 'cafe', nome: 'Café sem açúcar', taco: 471, categoria: 'outros', papeis: ['bebida'], porcao: 100, min: 50, max: 400, medida: { g: 50, nome: '1 xícara' } }),
+
+  // Docinhos (um por dia no plano; porção fixa)
+  a({ id: 'trento', nome: 'Trento', rotulo: { kcal: 528, proteina: 6.6, gordura: 29.4, carboidrato: 59 }, categoria: 'doce', papeis: ['doce'], porcao: 32, min: 32, max: 32, unidade: { g: 32, nome: 'unidade', plural: 'unidades' } }),
+  a({ id: 'nutella-bready', nome: 'Nutella B-ready', rotulo: { kcal: 518, proteina: 8.2, gordura: 26.8, carboidrato: 59 }, categoria: 'doce', papeis: ['doce'], porcao: 22, min: 22, max: 22, unidade: { g: 22, nome: 'unidade', plural: 'unidades' } }),
+  a({ id: 'bolo-pote', nome: 'Bolo de pote (porção pequena)', rotulo: { kcal: 300, proteina: 4.5, gordura: 13, carboidrato: 42 }, categoria: 'doce', papeis: ['doce'], porcao: 60, min: 60, max: 60, medida: { g: 60, nome: '⅓ de pote' } }),
+  a({ id: 'brigadeiro', nome: 'Brigadeiro', rotulo: { kcal: 375, proteina: 3.5, gordura: 14, carboidrato: 60 }, categoria: 'doce', papeis: ['doce'], porcao: 20, min: 20, max: 20, unidade: { g: 20, nome: 'brigadeiro', plural: 'brigadeiros' } }),
+  a({ id: 'bis', nome: 'Bis', rotulo: { kcal: 525, proteina: 6, gordura: 27, carboidrato: 64 }, categoria: 'doce', papeis: ['doce'], porcao: 13, min: 13, max: 13, medida: { g: 13, nome: '2 unidades' } }),
+  a({ id: 'chocolate-leite', nome: 'Chocolate ao leite', taco: 495, categoria: 'doce', papeis: ['doce'], porcao: 25, min: 25, max: 25, medida: { g: 25, nome: '4 quadradinhos' } }),
+  a({ id: 'chocolate-amargo', nome: 'Chocolate meio amargo', taco: 498, categoria: 'doce', papeis: ['doce'], porcao: 25, min: 25, max: 25, medida: { g: 25, nome: '4 quadradinhos' } }),
+  a({ id: 'pacoca', nome: 'Paçoca', taco: 579, categoria: 'doce', papeis: ['doce'], porcao: 20, min: 20, max: 20, unidade: { g: 20, nome: 'paçoca', plural: 'paçocas' } }),
+  a({ id: 'pe-de-moleque', nome: 'Pé-de-moleque', taco: 580, categoria: 'doce', papeis: ['doce'], porcao: 25, min: 25, max: 25, unidade: { g: 25, nome: 'unidade', plural: 'unidades' } }),
+  a({ id: 'doce-de-leite', nome: 'Doce de leite', taco: 501, categoria: 'doce', papeis: ['doce'], porcao: 20, min: 20, max: 20, medida: { g: 20, nome: '1 colher de sopa' } }),
 ];
 
 export const ALIMENTO_POR_ID = new Map(ALIMENTOS.map((x) => [x.id, x]));

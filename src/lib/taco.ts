@@ -30,8 +30,18 @@ export function tacoPorId(id: number): ItemTaco {
 
 /** Nutrientes por 100 g de um alimento da lista enxuta ("frango-peito") ou da TACO ("taco:410"). */
 export function por100g(alimentoId: string): Nutrientes {
-  const t = alimentoId.startsWith('taco:') ? tacoPorId(Number(alimentoId.slice(5))) : tacoPorId(alimentoOuErro(alimentoId).taco);
+  if (!alimentoId.startsWith('taco:')) {
+    const a = alimentoOuErro(alimentoId);
+    if (a.rotulo) return { ...a.rotulo };
+    alimentoId = `taco:${a.taco}`;
+  }
+  const t = tacoPorId(Number(alimentoId.slice(5)));
   return { kcal: t.kcal, proteina: t.proteina, gordura: t.gordura, carboidrato: t.carboidrato };
+}
+
+/** Os valores vêm de rótulo típico (aproximados), não da TACO. */
+export function ehAproximado(alimentoId: string): boolean {
+  return !alimentoId.startsWith('taco:') && !!alimentoOuErro(alimentoId).rotulo;
 }
 
 export function alimentoOuErro(id: string): Alimento {
@@ -78,7 +88,7 @@ export function buscar(texto: string, limite = 30): ResultadoBusca[] {
   const enxuta = ALIMENTOS.filter((a) => bate(a.nome)).map((a) => ({
     alimentoId: a.id,
     nome: a.nome,
-    detalhe: `${tacoPorId(a.taco).kcal} kcal / 100 g`,
+    detalhe: `${por100g(a.id).kcal} kcal / 100 g${a.rotulo ? ' · valor aproximado' : ''}`,
   }));
   const usados = new Set(ALIMENTOS.filter((a) => bate(a.nome)).map((a) => a.taco));
   const taco = TACO.filter((t) => t.kcal > 0 && !usados.has(t.id) && bate(t.nome)).map((t) => ({
@@ -100,7 +110,8 @@ export function descreverPorcao(alimentoId: string, gramas: number): string {
   if (a.unidade) {
     const n = Math.round((gramas / a.unidade.g) * 2) / 2;
     const qtd = n % 1 ? n.toLocaleString('pt-BR') : String(n);
-    return `${qtd} ${n === 1 ? a.unidade.nome : a.unidade.plural} (${gramas} g)`;
+    const nomeUnidade = n === 1 ? a.unidade.nome : a.unidade.plural;
+    return nomeUnidade.includes('ml') ? `${qtd} ${nomeUnidade}` : `${qtd} ${nomeUnidade} (${gramas} g)`;
   }
   if (a.medida) {
     const n = gramas / a.medida.g;
