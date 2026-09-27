@@ -24,5 +24,7 @@ export const REFERENCIAS: Referencia[] = [
   { texto: 'Ryan, D. H. (2025). New drugs for the treatment of obesity: do we need approaches to preserve muscle mass? Rev Endocr Metab Disord, 26(5), 805–813.', doi: '10.1007/s11154-025-09967-4' },
   { texto: 'Şimşek, H., & Uçar, A. (2026). GLP-1 receptor agonists for obesity management in older adults: a scoping review. Curr Nutr Rep, 15(1).', doi: '10.1007/s13668-026-00777-x' },
   { texto: 'Mozaffarian, D., et al. (2025). Nutritional priorities to support GLP-1 therapy for obesity: a joint Advisory. Am J Clin Nutr, 122(1), 344–367. (errata publicada em 2026)', doi: '10.1016/j.ajcnut.2025.04.023' },
+  { texto: 'Jensen, M. D., et al. (2014). 2013 AHA/ACC/TOS Guideline for the Management of Overweight and Obesity in Adults. Circulation, 129(25 Suppl 2).', doi: '10.1161/01.cir.0000437739.71477.ee' },
+  { texto: 'EFSA Panel on Dietetic Products, Nutrition and Allergies (2010). Scientific Opinion on Dietary Reference Values for water. EFSA Journal, 8(3), 1459.', doi: '10.2903/j.efsa.2010.1459' },
   { texto: 'Al-Najim, W., et al. (2025). Unintended consequences of obesity pharmacotherapy: a nutritional approach. Nutrients, 17(11), 1934.', doi: '10.3390/nu17111934' },
 ];

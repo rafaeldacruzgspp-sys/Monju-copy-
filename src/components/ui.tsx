@@ -232,5 +232,12 @@ export const Icone = {
       <path d="M3 10h18M8 3v4M16 3v4" />
     </>,
   ),
+  prato: svg(
+    <>
+      <circle cx="12" cy="13" r="7" />
+      <circle cx="12" cy="13" r="3.5" />
+      <path d="M4 3v5M2.5 3v4a1.5 1.5 0 0 0 3 0V3M21 3c-1.5 1-2 3-2 5h2v13" />
+    </>,
+  ),
   livro: svg(<path d="M4 4h6a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4zM20 4h-6a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h7z" />),
 };

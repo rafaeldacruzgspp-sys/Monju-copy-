@@ -162,7 +162,7 @@ pão integral = carboidrato de café).
 
 1. Remove alimentos marcados ✕. Se um papel ficar sem opções, o item é omitido e a refeição
    mostra um aviso ("sem opções de proteína — revise suas preferências").
-2. Sorteio ponderado: favoritos têm peso 3, demais peso 1; evita o mesmo alimento no mesmo
+2. Sorteio ponderado: favoritos têm peso 6, demais peso 1; evita o mesmo alimento no mesmo
    papel em dias consecutivos quando houver alternativa.
 3. Porções, nesta ordem:
    - itens de porção fixa (fruta, laticínio, leguminosa, azeite, salada) usam a porção padrão;

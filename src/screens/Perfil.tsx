@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { AlertaRitmo, CartaoEstudos, SeletorPrazo } from '../components/PrazoInfo';
-import { Botao, Card, Campo, Icone, SeloImc } from '../components/ui';
+import { FormPreferencias } from '../components/Preferencias';
+import { Botao, Card, Campo, Folha, Icone, SeloImc } from '../components/ui';
 import { apagarTudo, exportarBackup, importarBackup } from '../lib/backup';
 import { fmt, hojeISO, idadeAtual } from '../lib/calculos';
 import { db, maisRecente, type NivelAtividade, type Sexo } from '../lib/db';
@@ -26,6 +27,7 @@ export function Perfil({ dados, aoErro, abrirSobre }: { dados: Dados; aoErro: (m
   const [prazo, setPrazo] = useState(perfil.prazoSemanas);
   const [intervalo, setIntervalo] = useState(String(perfil.intervaloDoseDias));
   const [salvo, setSalvo] = useState(false);
+  const [editandoPref, setEditandoPref] = useState(false);
   const [confirmarApagar, setConfirmarApagar] = useState(0);
   const [confirmarImportar, setConfirmarImportar] = useState<string | null>(null);
   const arquivoRef = useRef<HTMLInputElement>(null);
@@ -175,6 +177,13 @@ export function Perfil({ dados, aoErro, abrirSobre }: { dados: Dados; aoErro: (m
       </Card>
 
       <Card atraso={0.15}>
+        <button className="item" style={{ width: '100%', background: 'none', border: 0, textAlign: 'left' }} onClick={() => setEditandoPref(true)}>
+          <div className="item-icone">{Icone.prato}</div>
+          <div className="item-corpo">
+            <strong>Preferências alimentares</strong>
+            <small>Refeições por dia, o que não come e favoritos</small>
+          </div>
+        </button>
         <button className="item" style={{ width: '100%', background: 'none', border: 0, textAlign: 'left' }} onClick={abrirSobre}>
           <div className="item-icone">{Icone.livro}</div>
           <div className="item-corpo">
@@ -193,6 +202,10 @@ export function Perfil({ dados, aoErro, abrirSobre }: { dados: Dados; aoErro: (m
       >
         {confirmarApagar ? 'Tem certeza? Toque de novo para apagar tudo' : 'Apagar todos os dados'}
       </Botao>
+
+      <Folha aberta={editandoPref} aoFechar={() => setEditandoPref(false)} titulo="Preferências alimentares">
+        <FormPreferencias atual={dados.preferencias} aoSalvar={() => setEditandoPref(false)} aoErro={aoErro} />
+      </Folha>
     </div>
   );
 }
