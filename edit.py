@@ -15,6 +15,9 @@ ap.add_argument("src"); ap.add_argument("out")
 ap.add_argument("--music"); ap.add_argument("--start", type=float, default=0.0)
 ap.add_argument("--len", type=float, default=36.0)
 ap.add_argument("--work", default="work")
+ap.add_argument("--intro", type=float, default=None)
+ap.add_argument("--drop", type=float, default=None)
+ap.add_argument("--outro", type=float, default=None)
 a = ap.parse_args()
 os.makedirs(a.work, exist_ok=True)
 
@@ -87,6 +90,8 @@ def analyse(path, start, length):
     q = np.quantile(e, [0.35, 0.7])
     energy = [0 if v < q[0] else (1 if v < q[1] else 2) for v in e]
     energy[-4:] = [3] * min(4, len(energy))
+    if a.drop is not None:  # explicit song structure (seconds relative to --start)
+        energy = [0 if b < a.intro else 1 if b < a.drop - 0.05 else 2 if b < a.outro - 0.05 else 3 for b in bt]
     return list(bt), energy, len(y) / sr
 
 music = os.path.join(a.work, "music.wav")
